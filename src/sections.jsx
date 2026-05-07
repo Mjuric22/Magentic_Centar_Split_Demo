@@ -158,6 +158,15 @@ const About = () => (
   </section>
 );
 
+// Mapa: ime Signature tretmana → id u BOOKING_TREATMENTS
+const SIG_ID = {
+  'HydraFacial':                 'hydra',
+  'TESLA elektromagnet':         'tesla',
+  'Zerona Green Laser':          'zerona',
+  'Maderoterapija':              'mader',
+  'Dijamantna mikrodermoabrazija': 'derma',
+};
+
 // ============================================================
 // SERVICES — Signature tretmani integrirani kao kartica
 // ============================================================
@@ -260,7 +269,7 @@ const ServicesSection = ({ onBook }) => {
                       <p className="service-desc-mob">Tehnologija u službi opuštanja — naši najtraženiji premium tretmani s vidljivim rezultatima.</p>
                       <div className="sig-inline-list">
                         {SIGNATURE.map((tr, i) => (
-                          <div key={tr.name} className="sig-inline-row" onClick={onBook}>
+                          <div key={tr.name} className="sig-inline-row" onClick={() => onBook(SIG_ID[tr.name])}>
                             <span className="sig-inline-num">— 0{i + 1}</span>
                             <div className="sig-inline-content">
                               <h4 className="sig-inline-name">{tr.name}</h4>

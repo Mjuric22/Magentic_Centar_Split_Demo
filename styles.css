@@ -2309,7 +2309,7 @@ body[data-density="spacious"] { --section-y: clamp(96px, 12vw, 180px); }
   .hero {
     min-height: 100svh;
     align-items: flex-end;
-    padding: 80px 0 40px;
+    padding: 80px 0 48px;
   }
   .hero-ctas {
     flex-direction: column;
@@ -2319,14 +2319,8 @@ body[data-density="spacious"] { --section-y: clamp(96px, 12vw, 180px); }
     margin: 0 auto;
   }
   .hero-meta {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0;
+    display: none;
   }
-  .hero-stat + .hero-stat {
-    border-left: 1px solid var(--line);
-  }
-  .hero-stat-num { font-size: clamp(26px, 7.5vw, 34px); }
 }
 
 /* ≤ 480px */

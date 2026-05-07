@@ -9,6 +9,7 @@ const { useState: aS, useEffect: aE } = React;
 function App() {
   const [t, setTweak] = useTweaks(window.__TWEAKS_DEFAULTS__ || {});
   const [bookingOpen, setBookingOpen] = aS(false);
+  const [bookingTreatmentId, setBookingTreatmentId] = aS(null);
   const [showSticky, setShowSticky] = aS(false);
 
   // Apply palette + headline-font to body
@@ -50,7 +51,10 @@ function App() {
     return () => window.removeEventListener('mousemove', onMove);
   }, []);
 
-  const openBooking = () => setBookingOpen(true);
+  const openBooking = (treatmentId = null) => {
+    setBookingTreatmentId(treatmentId || null);
+    setBookingOpen(true);
+  };
 
   return (
     <>
@@ -69,7 +73,7 @@ function App() {
 
       <StickyCTA onBook={openBooking} visible={showSticky && t.showStickyCta} />
 
-      <BookingModal open={bookingOpen} onClose={() => setBookingOpen(false)} />
+      <BookingModal open={bookingOpen} onClose={() => setBookingOpen(false)} initialTreatmentId={bookingTreatmentId} />
 
       <TweaksPanel title="Tweaks">
         <TweakSection label="Stil" />
