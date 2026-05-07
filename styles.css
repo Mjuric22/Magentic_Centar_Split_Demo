@@ -2129,22 +2129,119 @@ body[data-density="spacious"] { --section-y: clamp(96px, 12vw, 180px); }
 }
 
 /* ===========================================================
-   SIGNATURE SUB-SECTION (under Services)
+   SIGNATURE CARD — inline accordion body
    =========================================================== */
 
-.sig-sub {
-  margin-top: 72px;
-  padding-top: 56px;
+/* Gold icon variant for Signature card */
+.service-icon-wrap--gold {
+  background: linear-gradient(135deg, var(--accent-deep) 0%, var(--accent) 100%) !important;
+  color: var(--burgundy-deep) !important;
+  border-color: var(--accent) !important;
+}
+
+/* Signature card header accent */
+.service-item--signature .service-head {
+  border-left: 2px solid var(--accent);
+}
+
+.service-item--signature.open .service-icon-wrap--gold {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-bright) 100%) !important;
+}
+
+/* Inline signature list */
+.sig-inline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.sig-inline-row {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  gap: 16px;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--line);
+  align-items: start;
+  cursor: pointer;
+  transition: padding-left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sig-inline-row:first-child {
   border-top: 1px solid var(--line);
 }
 
-.sig-sub-head {
+.sig-inline-row:hover {
+  padding-left: 8px;
+}
+
+.sig-inline-num {
+  font-family: var(--display);
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  padding-top: 5px;
+}
+
+.sig-inline-name {
+  font-family: var(--serif);
+  font-size: clamp(17px, 2.2vw, 21px);
+  font-weight: 400;
+  color: var(--ink);
+  margin: 0 0 6px;
+  line-height: 1.2;
+  transition: color 0.25s ease;
+}
+
+.sig-inline-row:hover .sig-inline-name {
+  color: var(--accent-bright);
+}
+
+.sig-inline-desc {
+  font-size: 13px;
+  color: var(--ink-dim);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.sig-inline-meta {
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  margin-bottom: 40px;
-  flex-wrap: wrap;
-  gap: 20px;
+  flex-direction: column;
+  gap: 4px;
+  text-align: right;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  white-space: nowrap;
+  padding-top: 4px;
+  flex-shrink: 0;
+}
+
+.sig-inline-meta strong {
+  color: var(--accent);
+  font-family: var(--display);
+  font-size: 17px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+@media (max-width: 640px) {
+  .sig-inline-row {
+    grid-template-columns: 36px 1fr;
+    gap: 10px 12px;
+  }
+  .sig-inline-meta {
+    grid-column: 2;
+    text-align: left;
+    flex-direction: row;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding-top: 8px;
+  }
+  .sig-inline-desc { display: none; }
 }
 
 /* ===========================================================
@@ -2204,15 +2301,15 @@ body[data-density="spacious"] { --section-y: clamp(96px, 12vw, 180px); }
 
 /* ≤ 768px — general */
 @media (max-width: 768px) {
-  .sig-sub-head { flex-direction: column; align-items: flex-start; }
-  .sig-sub-head .btn { width: 100%; justify-content: center; }
+  .sig-inline-list { margin-top: 0; }
 }
 
 /* ≤ 640px */
 @media (max-width: 640px) {
   .hero {
-    min-height: 50svh;
-    padding: 88px 0 56px;
+    min-height: 100svh;
+    align-items: flex-end;
+    padding: 80px 0 40px;
   }
   .hero-ctas {
     flex-direction: column;
@@ -2236,8 +2333,9 @@ body[data-density="spacious"] { --section-y: clamp(96px, 12vw, 180px); }
 @media (max-width: 480px) {
   :root { --section-y: clamp(52px, 8vw, 80px); }
   .hero {
-    min-height: 50svh;
-    padding: 76px 0 48px;
+    min-height: 100svh;
+    align-items: flex-end;
+    padding: 80px 0 36px;
   }
   .hero-badge { display: none; }
   .section-num { display: none; }

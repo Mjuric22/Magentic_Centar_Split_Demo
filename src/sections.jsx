@@ -159,12 +159,13 @@ const About = () => (
 );
 
 // ============================================================
-// SERVICES — s ugrađenim Signature tretmanima
+// SERVICES — Signature tretmani integrirani kao kartica
 // ============================================================
 const ServicesSection = ({ onBook }) => {
   const [filter, setFilter] = _su('all');
   const [openId, setOpenId] = _su(null);
   const filtered = filter === 'all' ? SERVICES : SERVICES.filter(s => s.cat === filter);
+  const showSig = filter === 'all';
 
   return (
     <section id="usluge">
@@ -193,7 +194,7 @@ const ServicesSection = ({ onBook }) => {
         </div>
 
         <div className="services-wrap">
-          {filtered.map((s, i) => {
+          {filtered.map((s) => {
             const id = `${filter}-${s.title}`;
             const isOpen = openId === id;
             const cat = SERVICE_CATEGORIES.find(c => c.id === s.cat);
@@ -231,34 +232,56 @@ const ServicesSection = ({ onBook }) => {
               </div>
             );
           })}
-        </div>
 
-        {/* Signature tretmani — ugrađeni pod usluge */}
-        <div className="sig-sub">
-          <div className="sig-sub-head">
-            <div>
-              <span className="eyebrow">Signature tretmani</span>
-              <h3 className="h-serif" style={{ margin: '10px 0 0', fontSize: 'clamp(26px, 3vw, 40px)' }}>
-                Tehnologija u službi <em style={{ color: 'var(--accent)' }}>opuštanja.</em>
-              </h3>
-            </div>
-            <button className="btn btn-ghost" onClick={onBook} style={{ flexShrink: 0 }}>
-              Rezerviraj tretman
-            </button>
-          </div>
-          <div className="sig-list">
-            {SIGNATURE.map((t, i) => (
-              <Reveal key={t.name} index={i} as="div" className="sig-row" onClick={onBook} style={{ cursor: 'pointer' }}>
-                <span className="sig-num">— 0{i + 1}</span>
-                <h3 className="sig-name h-serif">{t.name}</h3>
-                <p className="sig-desc">{t.desc}</p>
-                <div className="sig-meta">
-                  <span>{t.duration}</span>
-                  <strong>{t.from}</strong>
+          {/* Signature tretmani — posebna kartica uvijek vidljiva u "Sve" filtru */}
+          {showSig && (() => {
+            const isOpen = openId === '__signature__';
+            return (
+              <div className={'service-item service-item--signature ' + (isOpen ? 'open' : '')}>
+                <button
+                  className="service-head"
+                  onClick={() => setOpenId(isOpen ? null : '__signature__')}
+                  aria-expanded={isOpen}
+                >
+                  <span className="service-icon-wrap service-icon-wrap--gold">
+                    <Icon name="sparkle" size={26} />
+                  </span>
+                  <span className="service-head-text">
+                    <span className="service-title-mob">Signature tretmani</span>
+                    <span className="service-sub-mob">Premium · 5 tretmana</span>
+                  </span>
+                  <span className="service-toggle" aria-hidden="true">
+                    <Icon name="close" size={14} />
+                  </span>
+                </button>
+                <div className="service-body">
+                  <div className="service-body-inner">
+                    <div className="service-body-content">
+                      <p className="service-desc-mob">Tehnologija u službi opuštanja — naši najtraženiji premium tretmani s vidljivim rezultatima.</p>
+                      <div className="sig-inline-list">
+                        {SIGNATURE.map((tr, i) => (
+                          <div key={tr.name} className="sig-inline-row" onClick={onBook}>
+                            <span className="sig-inline-num">— 0{i + 1}</span>
+                            <div className="sig-inline-content">
+                              <h4 className="sig-inline-name">{tr.name}</h4>
+                              <p className="sig-inline-desc">{tr.desc}</p>
+                            </div>
+                            <div className="sig-inline-meta">
+                              <span>{tr.duration}</span>
+                              <strong>{tr.from}</strong>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <button className="service-cta" onClick={onBook}>
+                        Rezerviraj tretman <Icon name="arrow" size={12} />
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </Reveal>
-            ))}
-          </div>
+              </div>
+            );
+          })()}
         </div>
       </div>
     </section>

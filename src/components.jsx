@@ -34,10 +34,6 @@ const Nav = ({ onBook }) => {
             ))}
           </div>
           <div className="nav-cta-wrap" style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-            <a href="tel:+385916071297" className="nav-phone">
-              <Icon name="phone" size={14} />
-              <span>091 607 1297</span>
-            </a>
             <button className="btn btn-primary nav-cta" onClick={onBook}>Rezerviraj</button>
             <button className="nav-burger" aria-label="Otvori izbornik" onClick={() => setDrawerOpen(true)}>
               <Icon name="menu" size={22} />
@@ -61,10 +57,6 @@ const Nav = ({ onBook }) => {
           ))}
         </div>
         <div className="drawer-foot">
-          <a href="tel:+385916071297" className="nav-phone">
-            <Icon name="phone" size={14} />
-            091 607 1297
-          </a>
           <button className="btn btn-primary" onClick={() => { setDrawerOpen(false); onBook(); }}>
             Rezerviraj termin
           </button>
