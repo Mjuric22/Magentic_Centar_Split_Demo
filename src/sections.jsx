@@ -10,71 +10,36 @@ const Hero = ({ tweaks, onBook }) => {
   const line1 = titleLines.slice(0, -1).join(' ') || titleLines[0];
   const line2 = titleLines.length > 1 ? titleLines[titleLines.length - 1] : '';
 
-  const shapes = [
-    { delay: 0.3, w: 600, h: 140, rot: 12,  from: 'rgba(94,31,41,0.35)',     pos: { left: '-8%',  top: '18%' } },
-    { delay: 0.5, w: 500, h: 120, rot: -15, from: 'rgba(201,139,139,0.22)',  pos: { right: '-3%', top: '70%' } },
-    { delay: 0.4, w: 300, h: 80,  rot: -8,  from: 'rgba(214,178,124,0.25)',  pos: { left: '8%',   bottom: '8%' } },
-    { delay: 0.6, w: 200, h: 60,  rot: 20,  from: 'rgba(232,201,149,0.20)',  pos: { right: '18%', top: '12%' } },
-    { delay: 0.7, w: 150, h: 40,  rot: -25, from: 'rgba(245,235,224,0.14)',  pos: { left: '22%',  top: '8%' } },
-  ];
-
   return (
     <section className="hero" id="top">
-      <div className="hero-bg" aria-hidden="true"></div>
-      <div className="hero-blur" aria-hidden="true"></div>
-      <div className="hero-shapes" aria-hidden="true">
-        {shapes.map((s, i) => (
-          <div
-            key={i}
-            className="shape shape-pill"
-            style={{
-              ...s.pos,
-              width: s.w,
-              height: s.h,
-              animationDelay: `${s.delay}s, ${1.6 + s.delay}s`,
-              '--rot-from': `${s.rot - 15}deg`,
-              '--rot-to': `${s.rot}deg`,
-              '--shape-from': s.from,
-            }}
-          />
-        ))}
+      <div className="hero-bg" aria-hidden="true" />
+
+      {/* Lamp effect */}
+      <div className="hero-lamp" aria-hidden="true">
+        <div className="hero-lamp-glow" />
+        <div className="hero-lamp-line" />
+        <div className="hero-lamp-cone hero-lamp-l" />
+        <div className="hero-lamp-cone hero-lamp-r" />
       </div>
-      <div className="hero-fade" aria-hidden="true"></div>
+
+      <div className="hero-fade" aria-hidden="true" />
 
       <div className="hero-inner">
         <div className="hero-badge">
-          <span className="hero-badge-dot"></span>
+          <span className="hero-badge-dot" />
           <span>Centar zdravlja i ljepote · od 1996.</span>
         </div>
-
         <h1 className="hero-title">
           <span className="hero-title-1">{line1}</span>
           {line2 && <span className="hero-title-2">{line2}</span>}
         </h1>
-
         <p className="hero-lede">{tweaks.heroTagline}</p>
-
         <div className="hero-ctas">
           <button className="btn btn-primary" onClick={onBook}>
             Rezerviraj termin
             <Icon name="arrow" size={14} />
           </button>
           <a href="#usluge" className="btn btn-ghost">Pogledaj usluge</a>
-        </div>
-
-        <div className="hero-meta">
-          <div className="hero-stat">
-            <CountUp to={30} duration={2400} suffix="+" className="hero-stat-num" startDelay={1400} />
-            <span className="hero-stat-lbl">Godina iskustva</span>
-          </div>
-          <div className="hero-stat">
-            <CountUp to={4.5} duration={2000} decimals={1} suffix="★" className="hero-stat-num" startDelay={1400} />
-            <span className="hero-stat-lbl">126 Google recenzija</span>
-          </div>
-          <div className="hero-stat">
-            <CountUp to={40} duration={2400} suffix="+" className="hero-stat-num" startDelay={1400} />
-            <span className="hero-stat-lbl">Tretmana</span>
-          </div>
         </div>
       </div>
     </section>
@@ -152,6 +117,23 @@ const About = () => (
               </div>
             </Reveal>
           </ul>
+
+          <Reveal delay={540}>
+            <div className="about-stats">
+              <div className="about-stat">
+                <CountUp to={30} duration={2400} suffix="+" className="about-stat-num" />
+                <span className="about-stat-lbl">Godina iskustva</span>
+              </div>
+              <div className="about-stat">
+                <CountUp to={4.5} duration={2000} decimals={1} suffix="★" className="about-stat-num" />
+                <span className="about-stat-lbl">126 Google recenzija</span>
+              </div>
+              <div className="about-stat">
+                <CountUp to={40} duration={2400} suffix="+" className="about-stat-num" />
+                <span className="about-stat-lbl">Tretmana u ponudi</span>
+              </div>
+            </div>
+          </Reveal>
         </div>
       </div>
     </div>
@@ -344,90 +326,51 @@ const PackagesSection = ({ onBook }) => (
 );
 
 // ============================================================
-// REVIEWS — testimonial slider
+// REVIEWS — 3D vertical marquee
 // ============================================================
 const ReviewsSection = () => {
-  const [active, setActive] = _su(0);
-  const touchStartX = _sr(null);
-  const timerRef = _sr(null);
-  const total = REVIEWS.length;
-
-  const resetTimer = () => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => setActive(c => (c + 1) % total), 4500);
-  };
-
-  _se(() => {
-    resetTimer();
-    return () => clearInterval(timerRef.current);
-  }, []);
-
-  const go = (d) => {
-    setActive(c => (c + d + total) % total);
-    resetTimer();
-  };
+  // Triple the pool so short lists scroll smoothly; distribute into 4 columns
+  const pool = [...REVIEWS, ...REVIEWS, ...REVIEWS];
+  const cols = [0, 1, 2, 3].map(ci => pool.filter((_, i) => i % 4 === ci));
 
   return (
     <section className="reviews" id="recenzije">
       <div className="container">
-        <div className="reviews-head">
-          <div className="text-block">
-            <span className="eyebrow">Riječ klijentica</span>
-            <h2 className="h-display" style={{ fontSize: 'clamp(36px, 5vw, 56px)', margin: '16px 0 0' }}>
-              Hvala vam<br/>na povjerenju.
-            </h2>
-          </div>
-          <div className="reviews-rating">
-            <Stars n={5} className="reviews-stars" />
-            <div className="reviews-rating-num">4.5<span>/5</span></div>
-            <span className="reviews-count">126 Google recenzija</span>
+        <div className="rev3d-head">
+          <span className="eyebrow">Riječ klijentica</span>
+          <h2 className="h-display" style={{ fontSize: 'clamp(36px, 5vw, 56px)', margin: '16px 0 24px' }}>
+            Hvala vam<br/>na povjerenju.
+          </h2>
+          <div className="rev3d-rating">
+            <Stars n={5} />
+            <span className="rev3d-rating-num">4.5<span>/5</span></span>
+            <span className="rev3d-count">126 Google recenzija</span>
           </div>
         </div>
 
-        <div
-          className="tslider"
-          onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
-          onTouchEnd={(e) => {
-            const dx = e.changedTouches[0].clientX - touchStartX.current;
-            if (Math.abs(dx) > 50) go(dx < 0 ? 1 : -1);
-          }}
-        >
-          <button className="tslider-arrow tslider-arrow-prev" onClick={() => go(-1)} aria-label="Prethodna recenzija">
-            <Icon name="arrow-left" size={20} />
-          </button>
-
-          <div className="tslider-viewport">
-            {REVIEWS.map((r, i) => (
-              <figure key={i} className={'tslider-card' + (i === active ? ' active' : '')}>
-                <div className="tslider-card-inner">
-                  <span className="review-quote">"</span>
-                  <p className="review-text">{r.text}</p>
-                  <figcaption className="review-author">
-                    <span className="review-avatar">{r.initials}</span>
-                    <div>
-                      <div className="review-name">{r.name}</div>
-                      <Stars n={r.stars} />
-                    </div>
-                  </figcaption>
+        <div className="rev3d-scene">
+          <div className="rev3d-perspective">
+            <div className="rev3d-cols">
+              {cols.map((col, ci) => (
+                <div key={ci} className="rev3d-col">
+                  <div className={'rev3d-track' + (ci % 2 !== 0 ? ' rev3d-track--up' : '')}>
+                    {col.map((r, i) => (
+                      <figure key={i} className="rev3d-card">
+                        <Stars n={r.stars} />
+                        <p className="rev3d-text">{r.text}</p>
+                        <figcaption className="rev3d-author">
+                          <span className="rev3d-avatar">{r.initials}</span>
+                          <span className="rev3d-name">{r.name}</span>
+                        </figcaption>
+                      </figure>
+                    ))}
+                  </div>
                 </div>
-              </figure>
-            ))}
+              ))}
+            </div>
           </div>
-
-          <button className="tslider-arrow tslider-arrow-next" onClick={() => go(1)} aria-label="Sljedeća recenzija">
-            <Icon name="arrow-right" size={20} />
-          </button>
-        </div>
-
-        <div className="tslider-dots">
-          {REVIEWS.map((_, i) => (
-            <button
-              key={i}
-              className={'tslider-dot' + (i === active ? ' active' : '')}
-              onClick={() => { setActive(i); resetTimer(); }}
-              aria-label={`Recenzija ${i + 1}`}
-            />
-          ))}
+          <div className="rev3d-fade-top" aria-hidden="true" />
+          <div className="rev3d-fade-bot" aria-hidden="true" />
         </div>
       </div>
     </section>
@@ -544,13 +487,14 @@ const ContactSection = ({ onBook }) => {
 };
 
 // ============================================================
-// FOOTER
+// FOOTER — rounded top, radial gradient, lamp line, Reveal cols
 // ============================================================
 const Footer = () => (
   <footer className="foot">
+    <div className="foot-lamp-line" aria-hidden="true" />
     <div className="container">
       <div className="foot-grid">
-        <div className="foot-col">
+        <Reveal index={0} as="div" className="foot-col">
           <div style={{ marginBottom: 24 }}>
             <a href="#top" className="logo">
               <span className="logo-mark">M</span>
@@ -564,31 +508,31 @@ const Footer = () => (
             Centar zdravlja i ljepote u Splitu — od 1996. godine. Tretmani lica i tijela,
             masaže, manikura i pedikura, frizerske usluge.
           </p>
-        </div>
+        </Reveal>
 
-        <div className="foot-col">
+        <Reveal index={1} as="div" className="foot-col">
           <h4>Usluge</h4>
           <ul>
             <li><a href="#usluge">Njega lica</a></li>
             <li><a href="#usluge">Oblikovanje tijela</a></li>
             <li><a href="#usluge">Masaže</a></li>
-            <li><a href="#usluge">Manikura & pedikura</a></li>
+            <li><a href="#usluge">Manikura &amp; pedikura</a></li>
             <li><a href="#usluge">Depilacija</a></li>
           </ul>
-        </div>
+        </Reveal>
 
-        <div className="foot-col">
+        <Reveal index={2} as="div" className="foot-col">
           <h4>Centar</h4>
           <ul>
             <li><a href="#o-nama">O nama</a></li>
-            <li><a href="#paketi">Pokloni & paketi</a></li>
+            <li><a href="#paketi">Pokloni &amp; paketi</a></li>
             <li><a href="#recenzije">Recenzije</a></li>
             <li><a href="#galerija">Galerija</a></li>
             <li><a href="#kontakt">Kontakt</a></li>
           </ul>
-        </div>
+        </Reveal>
 
-        <div className="foot-col">
+        <Reveal index={3} as="div" className="foot-col">
           <h4>Kontakt</h4>
           <ul>
             <li><a href="tel:+385916071297">091 607 1297</a></li>
@@ -599,7 +543,7 @@ const Footer = () => (
             <span>Pon–Pet: 07:00–20:00</span>
             <span>Sub: 08:00–13:00</span>
           </div>
-        </div>
+        </Reveal>
       </div>
 
       <div className="foot-bottom">
