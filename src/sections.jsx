@@ -1,6 +1,6 @@
-/* global React, ImgSlot, Icon, Stars, Reveal,
+/* global React, ImgSlot, Icon, Stars, Reveal, CountUp,
    SERVICES, SERVICE_CATEGORIES, SIGNATURE, PACKAGES, REVIEWS, HOURS */
-const { useState: _su, useMemo: _smm } = React;
+const { useState: _su, useMemo: _smm, useRef: _sr, useEffect: _se } = React;
 
 // ============================================================
 // HERO
@@ -10,7 +10,6 @@ const Hero = ({ tweaks, onBook }) => {
   const line1 = titleLines.slice(0, -1).join(' ') || titleLines[0];
   const line2 = titleLines.length > 1 ? titleLines[titleLines.length - 1] : '';
 
-  // Geometrijski oblici — pozicija, dimenzije, gradient, rotacija, delay
   const shapes = [
     { delay: 0.3, w: 600, h: 140, rot: 12,  from: 'rgba(94,31,41,0.35)',     pos: { left: '-8%',  top: '18%' } },
     { delay: 0.5, w: 500, h: 120, rot: -15, from: 'rgba(201,139,139,0.22)',  pos: { right: '-3%', top: '70%' } },
@@ -65,15 +64,15 @@ const Hero = ({ tweaks, onBook }) => {
 
         <div className="hero-meta">
           <div className="hero-stat">
-            <CountUp to={30} duration={2400} suffix="+" className="hero-stat-num" />
+            <CountUp to={30} duration={2400} suffix="+" className="hero-stat-num" startDelay={1400} />
             <span className="hero-stat-lbl">Godina iskustva</span>
           </div>
           <div className="hero-stat">
-            <CountUp to={4.5} duration={2000} decimals={1} suffix="★" className="hero-stat-num" />
+            <CountUp to={4.5} duration={2000} decimals={1} suffix="★" className="hero-stat-num" startDelay={1400} />
             <span className="hero-stat-lbl">126 Google recenzija</span>
           </div>
           <div className="hero-stat">
-            <CountUp to={40} duration={2400} suffix="+" className="hero-stat-num" />
+            <CountUp to={40} duration={2400} suffix="+" className="hero-stat-num" startDelay={1400} />
             <span className="hero-stat-lbl">Tretmana</span>
           </div>
         </div>
@@ -103,7 +102,7 @@ const Ribbon = () => {
 };
 
 // ============================================================
-// ABOUT
+// ABOUT — animated block by block
 // ============================================================
 const About = () => (
   <section className="about" id="o-nama">
@@ -114,47 +113,53 @@ const About = () => (
           <ImgSlot label={'aparat\nu uporabi'} />
         </Reveal>
 
-        <Reveal>
-          <span className="eyebrow">O nama</span>
-          <h2 className="h-display" style={{ fontSize: 'clamp(36px, 5vw, 64px)', margin: '16px 0 24px' }}>
-            Tri desetljeća<br/>
-            <em style={{ color: 'var(--accent)' }}>posvećenih ruku.</em>
-          </h2>
-          <p className="lede" style={{ marginBottom: 8 }}>
-            Magnetic Centar otvoren je 1996. godine kao mali kozmetički salon u kvartu Gripe.
-            Danas, nakon 30 godina, postali smo jedan od najprepoznatljivijih spa centara u Splitu.
-          </p>
+        <div className="about-content">
+          <Reveal delay={0}>
+            <span className="eyebrow">O nama</span>
+            <h2 className="h-display" style={{ fontSize: 'clamp(36px, 5vw, 64px)', margin: '16px 0 24px' }}>
+              Tri desetljeća<br/>
+              <em style={{ color: 'var(--accent)' }}>posvećenih ruku.</em>
+            </h2>
+          </Reveal>
+
+          <Reveal delay={160}>
+            <p className="lede" style={{ marginBottom: 8 }}>
+              Magnetic Centar otvoren je 1996. godine kao mali kozmetički salon u kvartu Gripe.
+              Danas, nakon 30 godina, postali smo jedan od najprepoznatljivijih spa centara u Splitu.
+            </p>
+          </Reveal>
+
           <ul className="about-points">
-            <li className="about-point">
+            <Reveal delay={270} as="li" className="about-point">
               <span className="about-point-num">01</span>
               <div>
                 <h3 className="about-point-title">Individualni pristup</h3>
                 <p>Svaki klijent ima svoju priču, kožu i ritam. Tretmani se uvijek prilagođavaju.</p>
               </div>
-            </li>
-            <li className="about-point">
+            </Reveal>
+            <Reveal delay={360} as="li" className="about-point">
               <span className="about-point-num">02</span>
               <div>
                 <h3 className="about-point-title">Vrhunski preparati</h3>
                 <p>Becos, Selvert Thermal, Maria Galland, Afrodita — radimo isključivo s renomiranim brendovima.</p>
               </div>
-            </li>
-            <li className="about-point">
+            </Reveal>
+            <Reveal delay={450} as="li" className="about-point">
               <span className="about-point-num">03</span>
               <div>
                 <h3 className="about-point-title">Tri odjela na jednom mjestu</h3>
                 <p>Tretmani lica i tijela, centar za oblikovanje, manikura & pedikura, frizerske usluge.</p>
               </div>
-            </li>
+            </Reveal>
           </ul>
-        </Reveal>
+        </div>
       </div>
     </div>
   </section>
 );
 
 // ============================================================
-// SERVICES — mobile-first akordion lista
+// SERVICES — s ugrađenim Signature tretmanima
 // ============================================================
 const ServicesSection = ({ onBook }) => {
   const [filter, setFilter] = _su('all');
@@ -189,7 +194,7 @@ const ServicesSection = ({ onBook }) => {
 
         <div className="services-wrap">
           {filtered.map((s, i) => {
-            const id = s.title;
+            const id = `${filter}-${s.title}`;
             const isOpen = openId === id;
             const cat = SERVICE_CATEGORIES.find(c => c.id === s.cat);
             return (
@@ -227,73 +232,78 @@ const ServicesSection = ({ onBook }) => {
             );
           })}
         </div>
+
+        {/* Signature tretmani — ugrađeni pod usluge */}
+        <div className="sig-sub">
+          <div className="sig-sub-head">
+            <div>
+              <span className="eyebrow">Signature tretmani</span>
+              <h3 className="h-serif" style={{ margin: '10px 0 0', fontSize: 'clamp(26px, 3vw, 40px)' }}>
+                Tehnologija u službi <em style={{ color: 'var(--accent)' }}>opuštanja.</em>
+              </h3>
+            </div>
+            <button className="btn btn-ghost" onClick={onBook} style={{ flexShrink: 0 }}>
+              Rezerviraj tretman
+            </button>
+          </div>
+          <div className="sig-list">
+            {SIGNATURE.map((t, i) => (
+              <Reveal key={t.name} index={i} as="div" className="sig-row" onClick={onBook} style={{ cursor: 'pointer' }}>
+                <span className="sig-num">— 0{i + 1}</span>
+                <h3 className="sig-name h-serif">{t.name}</h3>
+                <p className="sig-desc">{t.desc}</p>
+                <div className="sig-meta">
+                  <span>{t.duration}</span>
+                  <strong>{t.from}</strong>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );
 };
 
 // ============================================================
-// SIGNATURE TREATMENTS (list with hover)
-// ============================================================
-const SignatureSection = ({ onBook }) => (
-  <section className="signature" id="signature">
-    <div className="container">
-      <div className="section-head">
-        <div className="section-num">03</div>
-        <div className="text-block">
-          <span className="eyebrow">Signature tretmani</span>
-          <h2 className="h-display">Tehnologija u službi <em style={{ color: 'var(--accent)' }}>opuštanja.</em></h2>
-        </div>
-      </div>
-
-      <div className="sig-list">
-        {SIGNATURE.map((t, i) => (
-          <div key={t.name} className="sig-row" onClick={onBook}>
-            <span className="sig-num">— 0{i + 1}</span>
-            <h3 className="sig-name h-serif">{t.name}</h3>
-            <p className="sig-desc">{t.desc}</p>
-            <div className="sig-meta">
-              <span>{t.duration}</span>
-              <strong>{t.from}</strong>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
-);
-
-// ============================================================
-// PACKAGES
+// PACKAGES — pricing card style
 // ============================================================
 const PackagesSection = ({ onBook }) => (
   <section className="packages" id="paketi">
     <div className="container">
       <div className="section-head">
-        <div className="section-num">04</div>
+        <div className="section-num">03</div>
         <div className="text-block">
           <span className="eyebrow">Pokloni & paketi</span>
           <h2 className="h-display">Idealna prilika za <em style={{ color: 'var(--accent)' }}>poklon.</em></h2>
         </div>
       </div>
 
-      <div className="pkg-grid">
-        {PACKAGES.map(pkg => (
-          <Reveal key={pkg.name} as="article" className={'pkg ' + (pkg.featured ? 'featured' : '')}>
-            <div className="pkg-head">
-              <h3 className="pkg-name">{pkg.name}</h3>
-              <div>
-                <div className="pkg-price">{pkg.price}</div>
-                <span className="pkg-price-suf">{pkg.suffix}</span>
+      <div className="pkg-v2-grid">
+        {PACKAGES.map((pkg, i) => (
+          <Reveal key={pkg.name} index={i} as="article" className={'pkg-v2' + (pkg.featured ? ' pkg-v2-featured' : '')}>
+            <div className="pkg-v2-top" />
+            <div className="pkg-v2-body">
+              {pkg.featured && <span className="pkg-v2-badge">Najpopularniji</span>}
+              <h3 className="pkg-v2-name">{pkg.name}</h3>
+              <div className="pkg-v2-price-wrap">
+                <span className="pkg-v2-amount">{pkg.price}</span>
+                <span className="pkg-v2-per">{pkg.suffix}</span>
               </div>
+              <p className="pkg-v2-desc">{pkg.desc}</p>
+              <ul className="pkg-v2-list">
+                {pkg.items.map(it => (
+                  <li key={it}>
+                    <Icon name="check" size={14} />
+                    <span>{it}</span>
+                  </li>
+                ))}
+              </ul>
+              <button className={'btn ' + (pkg.featured ? 'btn-primary' : 'btn-ghost') + ' pkg-v2-cta'} onClick={onBook}>
+                Odaberi paket
+                <Icon name="arrow" size={14} />
+              </button>
             </div>
-            <p className="pkg-desc">{pkg.desc}</p>
-            <ul className="pkg-includes">
-              {pkg.items.map(it => <li key={it}>{it}</li>)}
-            </ul>
-            <button className={'btn ' + (pkg.featured ? 'btn-primary' : 'btn-ghost')} onClick={onBook}>
-              Odaberi paket
-            </button>
           </Reveal>
         ))}
       </div>
@@ -302,28 +312,28 @@ const PackagesSection = ({ onBook }) => (
 );
 
 // ============================================================
-// REVIEWS
+// REVIEWS — testimonial slider
 // ============================================================
 const ReviewsSection = () => {
-  // split u 2 reda i dupliciraj svaki za seamless loop
-  const half = Math.ceil(REVIEWS.length / 2);
-  const row1 = REVIEWS.slice(0, half);
-  const row2 = REVIEWS.slice(half);
-  const dup = (arr) => [...arr, ...arr];
+  const [active, setActive] = _su(0);
+  const touchStartX = _sr(null);
+  const timerRef = _sr(null);
+  const total = REVIEWS.length;
 
-  const Card = (r, i) => (
-    <figure key={i} className="review-card-mq">
-      <span className="review-quote">"</span>
-      <p className="review-text">{r.text}</p>
-      <figcaption className="review-author">
-        <span className="review-avatar">{r.initials}</span>
-        <div>
-          <div className="review-name">{r.name}</div>
-          <Stars n={r.stars} />
-        </div>
-      </figcaption>
-    </figure>
-  );
+  const resetTimer = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => setActive(c => (c + 1) % total), 4500);
+  };
+
+  _se(() => {
+    resetTimer();
+    return () => clearInterval(timerRef.current);
+  }, []);
+
+  const go = (d) => {
+    setActive(c => (c + d + total) % total);
+    resetTimer();
+  };
 
   return (
     <section className="reviews" id="recenzije">
@@ -341,14 +351,51 @@ const ReviewsSection = () => {
             <span className="reviews-count">126 Google recenzija</span>
           </div>
         </div>
-      </div>
 
-      <div className="reviews-marquee">
-        <div className="marquee-row">
-          {dup(row1).map((r, i) => Card(r, 'a' + i))}
+        <div
+          className="tslider"
+          onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
+          onTouchEnd={(e) => {
+            const dx = e.changedTouches[0].clientX - touchStartX.current;
+            if (Math.abs(dx) > 50) go(dx < 0 ? 1 : -1);
+          }}
+        >
+          <button className="tslider-arrow tslider-arrow-prev" onClick={() => go(-1)} aria-label="Prethodna recenzija">
+            <Icon name="arrow-left" size={20} />
+          </button>
+
+          <div className="tslider-viewport">
+            {REVIEWS.map((r, i) => (
+              <figure key={i} className={'tslider-card' + (i === active ? ' active' : '')}>
+                <div className="tslider-card-inner">
+                  <span className="review-quote">"</span>
+                  <p className="review-text">{r.text}</p>
+                  <figcaption className="review-author">
+                    <span className="review-avatar">{r.initials}</span>
+                    <div>
+                      <div className="review-name">{r.name}</div>
+                      <Stars n={r.stars} />
+                    </div>
+                  </figcaption>
+                </div>
+              </figure>
+            ))}
+          </div>
+
+          <button className="tslider-arrow tslider-arrow-next" onClick={() => go(1)} aria-label="Sljedeća recenzija">
+            <Icon name="arrow-right" size={20} />
+          </button>
         </div>
-        <div className="marquee-row reverse">
-          {dup(row2).map((r, i) => Card(r, 'b' + i))}
+
+        <div className="tslider-dots">
+          {REVIEWS.map((_, i) => (
+            <button
+              key={i}
+              className={'tslider-dot' + (i === active ? ' active' : '')}
+              onClick={() => { setActive(i); resetTimer(); }}
+              aria-label={`Recenzija ${i + 1}`}
+            />
+          ))}
         </div>
       </div>
     </section>
@@ -362,7 +409,7 @@ const GallerySection = () => (
   <section id="galerija">
     <div className="container">
       <div className="section-head">
-        <div className="section-num">05</div>
+        <div className="section-num">04</div>
         <div className="text-block">
           <span className="eyebrow">Galerija</span>
           <h2 className="h-display">Naš prostor.</h2>
@@ -389,7 +436,7 @@ const ContactSection = ({ onBook }) => {
     <section id="kontakt">
       <div className="container">
         <div className="section-head">
-          <div className="section-num">06</div>
+          <div className="section-num">05</div>
           <div className="text-block">
             <span className="eyebrow">Kontakt & lokacija</span>
             <h2 className="h-display">Posjetite nas.</h2>
@@ -404,17 +451,17 @@ const ContactSection = ({ onBook }) => {
               <span className="contact-secondary">Kvart Gripe — ulaz direktno s Osječke ulice</span>
             </div>
 
-            <div className="contact-block">
+            <div className="contact-block contact-block-compact">
               <span className="contact-label">Telefon & WhatsApp</span>
               <a href="tel:+385916071297" className="contact-value">+385 91 607 1297</a>
             </div>
 
-            <div className="contact-block">
+            <div className="contact-block contact-block-compact">
               <span className="contact-label">Email</span>
               <a href="mailto:info@magneticspa.hr" className="contact-value">info@magneticspa.hr</a>
             </div>
 
-            <div className="contact-block">
+            <div className="contact-block contact-hours-block">
               <span className="contact-label">Radno vrijeme</span>
               <div className="hours-table">
                 {HOURS.map(h => (
@@ -441,18 +488,15 @@ const ContactSection = ({ onBook }) => {
               </defs>
               <rect width="400" height="500" fill="var(--bg-elev)" />
               <rect width="400" height="500" fill="url(#grid)" />
-              {/* Streets */}
               <path d="M 0 220 Q 150 240 400 200" stroke="rgba(214,178,124,0.18)" strokeWidth="22" fill="none"/>
               <path d="M 0 220 Q 150 240 400 200" stroke="rgba(214,178,124,0.04)" strokeWidth="20" fill="none"/>
               <path d="M 200 0 L 220 500" stroke="rgba(214,178,124,0.14)" strokeWidth="14" fill="none"/>
               <path d="M 0 380 L 400 360" stroke="rgba(214,178,124,0.10)" strokeWidth="10" fill="none"/>
               <path d="M 320 0 L 340 500" stroke="rgba(214,178,124,0.10)" strokeWidth="8" fill="none"/>
-              {/* Building blocks */}
               <rect x="40" y="50" width="120" height="120" fill="rgba(94,31,41,0.4)" />
               <rect x="180" y="280" width="100" height="80" fill="rgba(94,31,41,0.3)" />
               <rect x="290" y="80" width="90" height="100" fill="rgba(94,31,41,0.3)" />
               <rect x="60" y="280" width="100" height="180" fill="rgba(94,31,41,0.35)" />
-              {/* Labels */}
               <text x="20" y="240" fill="rgba(214,178,124,0.5)" fontSize="9" fontFamily="monospace" letterSpacing="2">OSJEČKA UL.</text>
               <text x="225" y="160" fill="rgba(214,178,124,0.4)" fontSize="9" fontFamily="monospace" letterSpacing="2">RADNIČKA</text>
             </svg>
@@ -519,6 +563,10 @@ const Footer = () => (
             <li><a href="mailto:info@magneticspa.hr">info@magneticspa.hr</a></li>
             <li>Radnička ul. 1<br/>21000 Split</li>
           </ul>
+          <div className="foot-hours-compact">
+            <span>Pon–Pet: 07:00–20:00</span>
+            <span>Sub: 08:00–13:00</span>
+          </div>
         </div>
       </div>
 
@@ -535,6 +583,6 @@ const Footer = () => (
 );
 
 Object.assign(window, {
-  Hero, Ribbon, About, ServicesSection, SignatureSection,
+  Hero, Ribbon, About, ServicesSection,
   PackagesSection, ReviewsSection, GallerySection, ContactSection, Footer,
 });

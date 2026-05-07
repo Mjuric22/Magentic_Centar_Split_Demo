@@ -1,5 +1,5 @@
 /* global React, ReactDOM,
-   Nav, Hero, Ribbon, About, ServicesSection, SignatureSection,
+   Nav, Hero, Ribbon, About, ServicesSection,
    PackagesSection, ReviewsSection, GallerySection, ContactSection, Footer,
    StickyCTA, BookingModal,
    TweaksPanel, useTweaks, TweakSection, TweakRadio, TweakToggle, TweakText, TweakColor */
@@ -25,16 +25,42 @@ function App() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // Scroll progress bar
+  aE(() => {
+    const bar = document.querySelector('.scroll-progress');
+    if (!bar) return;
+    const onScroll = () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      bar.style.width = (max > 0 ? (window.scrollY / max) * 100 : 0) + '%';
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // Cursor glow (desktop pointer only)
+  aE(() => {
+    if (!window.matchMedia('(pointer: fine)').matches) return;
+    const glow = document.querySelector('.cursor-glow');
+    if (!glow) return;
+    const onMove = (e) => {
+      glow.style.left = e.clientX + 'px';
+      glow.style.top = e.clientY + 'px';
+    };
+    window.addEventListener('mousemove', onMove, { passive: true });
+    return () => window.removeEventListener('mousemove', onMove);
+  }, []);
+
   const openBooking = () => setBookingOpen(true);
 
   return (
     <>
+      <div className="scroll-progress" aria-hidden="true" />
+      <div className="cursor-glow" aria-hidden="true" />
       <Nav onBook={openBooking} />
       <Hero tweaks={t} onBook={openBooking} />
       <Ribbon />
       <About />
       <ServicesSection onBook={openBooking} />
-      <SignatureSection onBook={openBooking} />
       <PackagesSection onBook={openBooking} />
       <ReviewsSection />
       <GallerySection />

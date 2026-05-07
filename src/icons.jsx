@@ -165,7 +165,7 @@ const Logo = () => (
 );
 
 // CountUp — animira broj od 0 do target kad uđe u viewport
-const CountUp = ({ to = 100, duration = 1800, suffix = '', prefix = '', decimals = 0, className = '' }) => {
+const CountUp = ({ to = 100, duration = 1800, suffix = '', prefix = '', decimals = 0, className = '', startDelay = 0 }) => {
   const ref = _useRef2(null);
   const [val, setVal] = React.useState(0);
   _useEffect2(() => {
@@ -178,18 +178,18 @@ const CountUp = ({ to = 100, duration = 1800, suffix = '', prefix = '', decimals
       const t0 = performance.now() + delay;
       const tick = (now) => {
         const t = Math.min(1, Math.max(0, (now - t0) / duration));
-        const eased = 1 - Math.pow(1 - t, 3);
+        const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
         setVal(to * eased);
         if (t < 1) raf = requestAnimationFrame(tick);
         else setVal(to);
       };
       raf = requestAnimationFrame(tick);
     };
-    // If already in view at mount, kick off immediately
+    // If already in view at mount, kick off with startDelay
     const r = el.getBoundingClientRect();
     const vh = window.innerHeight || document.documentElement.clientHeight;
     if (r.top < vh && r.bottom > 0) {
-      start(120);
+      start(startDelay || 120);
     } else {
       const obs = new IntersectionObserver((entries) => {
         entries.forEach(e => {
@@ -200,7 +200,7 @@ const CountUp = ({ to = 100, duration = 1800, suffix = '', prefix = '', decimals
       return () => { obs.disconnect(); if (raf) cancelAnimationFrame(raf); };
     }
     return () => { if (raf) cancelAnimationFrame(raf); };
-  }, [to, duration]);
+  }, [to, duration, startDelay]);
   const display = decimals > 0 ? val.toFixed(decimals) : Math.floor(val).toString();
   return (
     <span ref={ref} className={className}>
@@ -217,8 +217,9 @@ const Stars = ({ n = 5, className = 'review-stars' }) => (
 );
 
 // Reveal-on-scroll wrapper
-const Reveal = ({ children, as: Tag = 'div', delay = 0, ...rest }) => {
+const Reveal = ({ children, as: Tag = 'div', delay = 0, index = 0, ...rest }) => {
   const ref = _useRef2(null);
+  const effectiveDelay = delay || (index * 90);
   _useEffect2(() => {
     const el = ref.current;
     if (!el) return;
@@ -226,16 +227,16 @@ const Reveal = ({ children, as: Tag = 'div', delay = 0, ...rest }) => {
       (entries) => {
         entries.forEach(e => {
           if (e.isIntersecting) {
-            setTimeout(() => el.classList.add('in'), delay);
+            setTimeout(() => el.classList.add('in'), effectiveDelay);
             obs.unobserve(el);
           }
         });
       },
-      { threshold: 0.12 }
+      { threshold: 0.08 }
     );
     obs.observe(el);
     return () => obs.disconnect();
-  }, [delay]);
+  }, [effectiveDelay]);
   return <Tag ref={ref} className={'reveal ' + (rest.className || '')} {...rest}>{children}</Tag>;
 };
 
